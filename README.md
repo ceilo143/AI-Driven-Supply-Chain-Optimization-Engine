@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-# --- STEP 1: DATA GENERATION ---
-# This simulates a real company's sales history
+
 def generate_data():
     print("Generating synthetic supply chain data...")
     np.random.seed(42)
@@ -24,7 +23,7 @@ def generate_data():
 
     df = pd.DataFrame(data)
 
-    # Logic: Sales increase by 15 units during promos and 10 units on weekends
+
     df['units_sold'] = (df['previous_day_sales'] * 0.6) + \
                        (df['promotion_active'] * 15) + \
                        (df['is_weekend'] * 10) + \
@@ -34,25 +33,24 @@ def generate_data():
     print("File 'inventory_data.csv' created successfully!\n")
 
 
-# Run the generator
+
 generate_data()
 
-# --- STEP 2: LOAD AND PREPARE DATA ---
+
 df = pd.read_csv('inventory_data.csv')
 
-# Features (What we use to predict) and Target (What we want to know)
+
 X = df[['day_of_week', 'promotion_active', 'previous_day_sales', 'current_stock', 'is_weekend']]
 y = df['units_sold']
 
-# Splitting data: 80% to train the AI, 20% to test if it's lying
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# --- STEP 3: MODEL TRAINING ---
-# Random Forest is excellent for Supply Chain because it handles "rules" well
+
 model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
-# --- STEP 4: EVALUATION ---
+
 predictions = model.predict(X_test)
 mae = mean_absolute_error(y_test, predictions)
 r2 = r2_score(y_test, predictions)
@@ -62,8 +60,7 @@ print(f"Mean Absolute Error: {mae:.2f} units")
 print(f"R-Squared Score: {r2:.2%}")
 print("--------------------------\n")
 
-# --- STEP 5: VISUALIZING FEATURE IMPORTANCE ---
-# This translates "Code" into "Business Strategy"
+
 plt.figure(figsize=(10, 6))
 feat_importances = pd.Series(model.feature_importances_, index=X.columns)
 feat_importances.nlargest(5).sort_values().plot(kind='barh', color='teal')
@@ -76,9 +73,7 @@ plt.tight_layout()
 print("Displaying Feature Importance chart...")
 plt.show()
 
-# --- STEP 6: SAMPLE PREDICTION (PRO VERSION) ---
-# We use a DataFrame here to avoid the "UserWarning" and keep names consistent
-# Example: Saturday (6), Promotion ON (1), 50 sales yesterday, 100 in stock, Weekend (1)
+
 new_scenario = pd.DataFrame([[6, 1, 50, 100, 1]], columns=X.columns)
 
 prediction = model.predict(new_scenario)
